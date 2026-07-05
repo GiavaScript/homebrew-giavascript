@@ -8,8 +8,8 @@ class Giavascript < Formula
   depends_on "crystal"
 
   def install
-    system "crystal", "build", "src/giavascript_cli.cr", "--release", "--no-debug", "-o", "bin/giavascript"
-    bin.install "bin/giavascript"
+    system "crystal", "build", "src/giavascript_cli.cr", "--release", "--no-debug", "-o", "giavascript"
+    bin.install "giavascript"
     bin.install_symlink "giavascript" => "gs"
   end
 
