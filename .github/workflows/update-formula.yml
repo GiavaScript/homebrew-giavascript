@@ -1,0 +1,50 @@
+name: Update formula
+
+on:
+  schedule:
+    # ponytail: weekly polling is enough; switch to upstream release dispatch if latency matters.
+    - cron: "17 3 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update formula
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          tag=$(gh api repos/GiavaScript/GiavaScript/releases/latest --jq .tag_name)
+          current=$(ruby -ne 'puts $1 if %r{/v([^/]+)\.tar\.gz}' Formula/giavascript.rb)
+          version=${tag#v}
+
+          [ "$version" = "$current" ] && exit 0
+
+          sha256=$(curl -fsSL "https://github.com/GiavaScript/GiavaScript/archive/refs/tags/$tag.tar.gz" | shasum -a 256 | cut -d ' ' -f 1)
+          ruby -pi -e "gsub(%r{archive/refs/tags/v[^\" ]+\\.tar\\.gz}, 'archive/refs/tags/$tag.tar.gz'); gsub(/sha256 \"[0-9a-f]+\"/, 'sha256 \"$sha256\"')" Formula/giavascript.rb
+
+      - name: Test formula
+        run: ruby -c Formula/giavascript.rb && brew style --except-cops Homebrew/InstallStepsSourceIndependence Formula/giavascript.rb
+
+      - name: Open update pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          git diff --quiet && exit 0
+          version=$(ruby -ne 'puts $1 if %r{/v([^/]+)\.tar\.gz}' Formula/giavascript.rb)
+          branch=update-giavascript-$version
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git switch -c "$branch"
+          git add Formula/giavascript.rb
+          git commit -m "Update GiavaScript formula"
+          git push origin "$branch"
+          gh pr create --fill --base main --head "$branch"
