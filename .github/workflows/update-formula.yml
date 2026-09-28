@@ -2,8 +2,7 @@ name: Update formula
 
 on:
   schedule:
-    # ponytail: weekly polling is enough; switch to upstream release dispatch if latency matters.
-    - cron: "17 3 * * 0"
+    - cron: "17 3 * * *"
   workflow_dispatch:
 
 permissions:
