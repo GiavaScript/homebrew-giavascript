@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   update:
@@ -32,18 +31,12 @@ jobs:
       - name: Test formula
         run: ruby -c Formula/giavascript.rb && brew style --except-cops Homebrew/InstallStepsSourceIndependence Formula/giavascript.rb
 
-      - name: Open update pull request
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Commit and push
         run: |
           set -eu
           git diff --quiet && exit 0
-          version=$(ruby -ne 'puts $1 if %r{/v([^/]+)\.tar\.gz}' Formula/giavascript.rb)
-          branch=update-giavascript-$version
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git switch -c "$branch"
           git add Formula/giavascript.rb
           git commit -m "Update GiavaScript formula"
-          git push origin "$branch"
-          gh pr create --fill --base main --head "$branch"
+          git push
