@@ -1,8 +1,8 @@
 class Giavascript < Formula
   desc "JavaScript runtime implemented in Crystal"
   homepage "https://github.com/GiavaScript/GiavaScript"
-  url "https://github.com/GiavaScript/GiavaScript/archive/refs/tags/v0.9.0.tar.gz"
-  sha256 "adc815f597272a5ff6fe5f4a69d5897ba76b32275bd8b918349f62256fbe6844"
+  url "https://github.com/GiavaScript/GiavaScript/archive/refs/tags/v0.10.0.tar.gz"
+  sha256 "b2105ee935d3b05bfbe0a785474a6a2f2c95c1e42064057cff008a3ff1959182"
   license "MIT"
 
   depends_on "crystal"
